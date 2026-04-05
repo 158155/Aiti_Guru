@@ -8,7 +8,7 @@ class Client(Base):
     __tablename__ = "clients"
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
-    email = Column(String(255), nullable=False, unique=True)
+    address = Column(Text, nullable=True)
 
     #Связь с заказами
     orders = relationship("Order", back_populates="client", lazy="select")
