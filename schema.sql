@@ -6,6 +6,8 @@ CREATE TABLE categories (
     parent_id   INTEGER REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
+CREATE INDEX idx_categories_parent_id ON categories(parent_id);
+
 -- products: номенклатура
 -- quantity — остаток на складе, price — текущая цена
 CREATE TABLE products (
@@ -15,6 +17,8 @@ CREATE TABLE products (
     price       DECIMAL(10,2) NOT NULL,
     category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
+
+CREATE INDEX idx_products_category_id ON products(category_id);
 
 -- clients: покупатели
 CREATE TABLE clients (
@@ -31,6 +35,8 @@ CREATE TABLE orders (
     created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_orders_created_at ON orders(created_at);
+CREATE INDEX idx_orders_client_id ON orders(client_id);
 
 -- order_items: строки заказа
 -- price дублируется из products на момент оформления, чтобы история покупок не менялась
@@ -45,6 +51,8 @@ CREATE TABLE order_items (
     CONSTRAINT uq_order_product UNIQUE (order_id, product_id)
 );
 
+CREATE INDEX idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX idx_order_items_product_id ON order_items(product_id);
 
 -- top5_products_last_month: отчёт «самые покупаемые товары за 30 дней»
 -- рекурсивный CTE поднимается по дереву категорий до корня, чтобы показать категорию 1-го уровня
