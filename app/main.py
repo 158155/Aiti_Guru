@@ -31,7 +31,7 @@ app.include_router(orders_router)
 def root():
     return {"message": "AITI Guru test task API is running"}
 
-
+@app.get("/health")
 def health_check():
     """Проверка работоспособности приложения + БД"""
     try:
