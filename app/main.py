@@ -32,6 +32,12 @@ def root():
     return {"message": "AITI Guru test task API is running"}
 
 
-@app.get("/health")
 def health_check():
-    return {"status": "OK"}
+    """Проверка работоспособности приложения + БД"""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        logger.error("БД недоступна: %s", e)
+        return {"status": "error", "database": str(e)}
