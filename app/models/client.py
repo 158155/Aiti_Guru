@@ -15,4 +15,4 @@ class Client(Base):
 
 
     def __repr__(self):
-        return f"<Client=({self.id}, name='{self.name}', email='{self.email}')>"
+        return f"<Client=({self.id}, name='{self.name}', address='{self.address}')>"
