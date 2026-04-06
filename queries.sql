@@ -3,7 +3,7 @@ SELECT
     c.name        AS client_name,
     SUM(oi.quantity * oi.price) AS total_sum
 FROM clients c
-JOIN orders o      ON o.id = c.id
+JOIN orders o      ON o.сlient_id = c.id
 JOIN order_items oi ON oi.order_id = o.id
 GROUP BY c.id, c.name
 ORDER BY total_sum DESC;
