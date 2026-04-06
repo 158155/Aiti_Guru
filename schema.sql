@@ -55,35 +55,48 @@ CREATE INDEX idx_order_items_order_id ON order_items(order_id);
 CREATE INDEX idx_order_items_product_id ON order_items(product_id);
 
 -- top5_products_last_month: отчёт «самые покупаемые товары за 30 дней»
--- рекурсивный CTE поднимается по дереву категорий до корня, чтобы показать категорию 1-го уровня
+-- сначала фильтруем заказы за 30 дней, потом рекурсия только для проданных товаров
+-- COALESCE обрабатывает случай, когда товар остался без категории (категорию удалили)
 CREATE OR REPLACE VIEW top5_products_last_month AS
-WITH RECURSIVE category_root AS (
-    -- стартовая точка: категория, к которой привязан товар
+-- Товары, которые реально продавались за 30 дней
+WITH recent_products AS (
     SELECT
-        p.id            AS product_id,
-        p.name          AS product_name,
-        c.id            AS category_id,
+        oi.product_id,
+        SUM(oi.quantity) AS total_quantity_sold
+    FROM order_items oi
+    JOIN orders o ON o.id = oi.order_id
+    WHERE o.created_at >= NOW() - INTERVAL '30 days'
+    GROUP BY oi.product_id
+),
+-- Рекурсия только для проданных товаров
+category_root AS (
+    -- Стартовая точка: категория проданного товара
+    SELECT
+        rp.product_id,
+        p.name AS product_name,
+        c.id AS category_id,
         c.parent_id,
-        c.name          AS category_name,
-        1               AS level
-    FROM products p
+        COALESCE(c.name, 'Без категории') AS category_name,
+        1 AS level
+    FROM recent_products rp
+    JOIN products p ON p.id = rp.product_id
     LEFT JOIN categories c ON p.category_id = c.id
 
     UNION ALL
 
-    -- шаг рекурсии: идём к родителю, пока parent_id не станет null
+    -- Шаг рекурсии: идём к родителю, пока parent_id не станет null
     SELECT
         cr.product_id,
         cr.product_name,
         cr.category_id,
         c.parent_id,
-        c.name          AS category_name,
+        c.name AS category_name,
         cr.level + 1
     FROM category_root cr
     JOIN categories c ON c.id = cr.parent_id
     WHERE cr.parent_id IS NOT NULL
 ),
--- оставляем только корневую запись (максимальный level) для каждого товара
+-- Оставляем только корневую запись (максимальный level) для каждого товара
 root_categories AS (
     SELECT DISTINCT ON (product_id)
         product_id,
@@ -95,11 +108,8 @@ root_categories AS (
 SELECT
     rc.product_name,
     rc.category_level1,
-    SUM(oi.quantity) AS total_quantity_sold
-FROM order_items oi
-JOIN orders o          ON o.id = oi.order_id
-JOIN root_categories rc ON rc.product_id = oi.product_id
-WHERE o.created_at >= NOW() - INTERVAL '30 days'
-GROUP BY rc.product_id, rc.product_name, rc.category_level1
-ORDER BY total_quantity_sold DESC
+    rp.total_quantity_sold
+FROM recent_products rp
+JOIN root_categories rc ON rc.product_id = rp.product_id
+ORDER BY rp.total_quantity_sold DESC
 LIMIT 5;
