@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix='/api/orders', tags=['orders'])
 
 
-@router.get('/{order_id}/items', response_model=OrderItemResponse)
+@router.post('/{order_id}/items', response_model=OrderItemResponse)
 def add_item_to_order(
     order_id: int,
     item_data: OrderItemCreate,
