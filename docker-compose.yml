@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16
-    container_name: itpro_postgres
+    container_name: aiti_guru_postgres
     restart: unless-stopped
     env_file:
       - .env.docker
@@ -11,7 +11,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d itpro"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aiti_guru"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -19,7 +19,7 @@ services:
 
   app:
     build: .
-    container_name: itpro_app
+    container_name: aiti_guru_app
     restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     env_file:

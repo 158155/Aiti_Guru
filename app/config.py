@@ -7,7 +7,7 @@ class Settings(BaseSettings):
         env_file=".env"
         )
     
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/aiti_guru_test"
+    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/aiti_guru"
     APP_HOST: str = "0.0.0.0"
     APP_PORT: int = 8000
 
