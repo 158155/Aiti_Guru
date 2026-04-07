@@ -59,7 +59,7 @@ CREATE INDEX idx_order_items_product_id ON order_items(product_id);
 -- COALESCE обрабатывает случай, когда товар остался без категории (категорию удалили)
 CREATE OR REPLACE VIEW top5_products_last_month AS
 -- Товары, которые реально продавались за 30 дней
-WITH recent_products AS (
+WITH RECURSIVE recent_products AS (
     SELECT
         oi.product_id,
         SUM(oi.quantity) AS total_quantity_sold
