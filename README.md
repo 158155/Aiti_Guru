@@ -113,7 +113,7 @@ app/
   main.py                — точка входа
 alembic/                 — миграции
 scripts/
-  seed_appliances.py     — загрузка тестовых данных
+  create_test_data.py    — загрузка тестовых данных
 queries.sql              — аналитические запросы
 schema.sql               — полная схема БД
 tests/                   — тесты
