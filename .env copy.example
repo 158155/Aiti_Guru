@@ -1,7 +1,0 @@
-# Шаблон переменных окружения для локальной разработки
-# Скопируйте в .env и измените под вашу конфигурацию
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/itpro
-APP_HOST=0.0.0.0
-APP_PORT=8000
-LOG_LEVEL=INFO
-LOG_FORMAT=%(asctime)s | %(levelname)-7s | %(name)s | %(message)s
